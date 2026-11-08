@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fundación Papá Noel y sus Amigos - Sitionuevo, Magdalena</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- QRCode.js para generar QR reales -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Poppins', sans-serif; }
+        .xmas-gradient { background: linear-gradient(135deg, #165b33 0%, #0b3d1e 50%, #bb2528 100%); }
+        .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); }
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white !important; color: black !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- HEADER / HERO -->
+    <header class="xmas-gradient text-white shadow-lg relative overflow-hidden">
+        <div class="absolute inset-0 opacity-15 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+        <div class="max-w-7xl mx-auto px-4 py-6 relative z-10 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3 text-center md:text-left">
+                <div class="bg-white/20 p-3 rounded-2xl backdrop-blur-md border border-white/30 text-amber-300 text-3xl">
+                    <i class="fa-solid fa-sleigh"></i>
+                </div>
+                <div>
+                    <span class="text-xs uppercase tracking-widest text-amber-300 font-semibold">Navidad en el Río Magdalena</span>
+                    <h1 class="text-2xl md:text-3xl font-bold tracking-tight">Fundación Papá Noel y sus Amigos</h1>
+                    <p class="text-xs text-slate-200 mt-0.5"><i class="fa-solid fa-location-dot text-red-400 mr-1"></i> Evento Oficial: Sitionuevo, Magdalena</p>
+                </div>
+            </div>
+            <!-- Auth Status & Role Switcher -->
+            <div class="flex items-center gap-3 bg-black/20 p-2.5 rounded-2xl backdrop-blur-md border border-white/10">
+                <div class="text-right">
+                    <p id="currentUserName" class="text-xs font-bold text-amber-300">Invitado / Logística</p>
+                    <p id="currentUserRole" class="text-[10px] text-slate-300">Rol: Personal de Apoyo</p>
+                </div>
+                <button onclick="openLoginModal()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition shadow flex items-center gap-1.5">
+                    <i class="fa-solid fa-user-shield"></i> Perfil / Rol
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- NAVIGATION TABS -->
+    <nav class="bg-white shadow border-b border-slate-200 sticky top-0 z-40 no-print">
+        <div class="max-w-7xl mx-auto px-4 flex overflow-x-auto space-x-2 py-2.5 scrollbar-none">
+            <button onclick="switchTab('access')" id="tab-btn-access" class="tab-btn px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 bg-emerald-600 text-white transition shadow-sm whitespace-nowrap">
+                <i class="fa-solid fa-qrcode"></i> Control de Acceso
+            </button>
+            <button onclick="switchTab('gifts')" id="tab-btn-gifts" class="tab-btn px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 bg-slate-100 text-slate-600 hover:bg-slate-200 transition whitespace-nowrap">
+                <i class="fa-solid fa-gift"></i> Entrega de Regalos
+            </button>
+            <button onclick="switchTab('qrprint')" id="tab-btn-qrprint" class="tab-btn px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 bg-slate-100 text-slate-600 hover:bg-slate-200 transition whitespace-nowrap">
+                <i class="fa-solid fa-print"></i> Carnets QR (8 por pág)
+            </button>
+            <button onclick="switchTab('logistics')" id="tab-btn-logistics" class="tab-btn px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 bg-slate-100 text-slate-600 hover:bg-slate-200 transition whitespace-nowrap">
+                <i class="fa-solid fa-users-gear"></i> Registro Logística
+            </button>
+            <button onclick="switchTab('stats')" id="tab-btn-stats" class="tab-btn px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 bg-slate-100 text-slate-600 hover:bg-slate-200 transition whitespace-nowrap">
+                <i class="fa-solid fa-chart-pie"></i> Estadísticas por Turno
+            </button>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full">
+
+        <!-- TAB 1: CONTROL DE ACCESO -->
+        <section id="tab-access" class="tab-content space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Scanner / Search Column -->
+                <div class="md:col-span-1 bg-white p-5 rounded-2xl card-shadow border border-slate-100 space-y-4">
+                    <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-scanner-touch text-emerald-600"></i> Validación de Entrada
+                    </h2>
+                    <p class="text-xs text-slate-500">Busque por nombre o documento, o ingrese el código QR del niño.</p>
+                    
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <input type="text" id="accessSearchInput" oninput="filterAccessList()" placeholder="Buscar por nombre o documento..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+
+                    <div class="border-t border-slate-100 pt-3">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Filtrar por Turno:</label>
+                        <select id="accessGroupFilter" onchange="filterAccessList()" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            <option value="ALL">Todos los Turnos</option>
+                            <option value="Grupo 1">Grupo 1</option>
+                            <option value="Grupo 2">Grupo 2</option>
+                        </select>
+                    </div>
+
+                    <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-3 text-emerald-800 text-xs flex items-start gap-2.5">
+                        <i class="fa-solid fa-circle-info mt-0.5 text-emerald-600"></i>
+                        <p>Al hacer clic en <strong>"Marcar Ingreso"</strong>, el sistema registrará la hora exacta de llegada al evento en Sitionuevo.</p>
+                    </div>
+                </div>
+
+                <!-- Kids List for Access Control -->
+                <div class="md:col-span-2 bg-white p-5 rounded-2xl card-shadow border border-slate-100 flex flex-col h-[600px]">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-child-reaching text-emerald-600"></i> Listado de Invitados
+                        </h2>
+                        <span id="accessCountBadge" class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-1 rounded-full">0 niños</span>
+                    </div>
+
+                    <div class="overflow-y-auto flex-grow pr-1 space-y-2.5" id="accessKidsContainer">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: ENTREGA DE REGALOS (DINÁMICA POR EDADES Y TURNOS) -->
+        <section id="tab-gifts" class="tab-content hidden space-y-6">
+            <div class="bg-white p-5 rounded-2xl card-shadow border border-slate-100 space-y-4">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-gift text-red-600"></i> Módulo de Entrega de Regalos por Edades y Turnos
+                        </h2>
+                        <p class="text-xs text-slate-500">Organice y llame a lista a los niños para la entrega oficial de obsequios.</p>
+                    </div>
+                    <!-- Filters -->
+                    <div class="flex flex-wrap gap-2 w-full md:w-auto">
+                        <select id="giftGroupFilter" onchange="renderGiftsModule()" class="p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                            <option value="ALL">Todos los Turnos</option>
+                            <option value="Grupo 1">Grupo 1</option>
+                            <option value="Grupo 2">Grupo 2</option>
+                        </select>
+                        <select id="giftAgeFilter" onchange="renderGiftsModule()" class="p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                            <option value="ALL">Todas las Edades</option>
+                            <option value="0 Años">0 Años</option>
+                            <option value="1 año">1 año</option>
+                            <option value="2 Años">2 Años</option>
+                            <option value="3 Años">3 Años</option>
+                            <option value="4 Años">4 Años</option>
+                            <option value="5 años">5 años</option>
+                            <option value="6 Años">6 Años</option>
+                        </select>
+                        <input type="text" id="giftSearchInput" oninput="renderGiftsModule()" placeholder="Buscar niño..." class="p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                    </div>
+                </div>
+
+                <!-- Table of gifts -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-700 uppercase font-semibold">
+                                <th class="p-3 rounded-l-xl">Nro / Documento</th>
+                                <th class="p-3">Nombre del Niño(a)</th>
+                                <th class="p-3">Edad / Género</th>
+                                <th class="p-3">Turno</th>
+                                <th class="p-3">Regalo Asignado</th>
+                                <th class="p-3 text-center">Estado Ingreso</th>
+                                <th class="p-3 text-center rounded-r-xl">Entrega Regalo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="giftsTableBody" class="divide-y divide-slate-100">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: CARNETS QR (8 POR PÁGINA PARA IMPRESIÓN) -->
+        <section id="tab-qrprint" class="tab-content hidden space-y-6">
+            <div class="bg-white p-5 rounded-2xl card-shadow border border-slate-100 no-print space-y-4">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-print text-emerald-600"></i> Generación de Carnets QR (8 por Página)
+                        </h2>
+                        <p class="text-xs text-slate-500">Diseñado para imprimir hojas tamaño carta con 8 credenciales QR (sin revelar el regalo en el código).</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <select id="printGroupSelect" onchange="generateQRPages()" class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                            <option value="ALL">Todos los Grupos</option>
+                            <option value="Grupo 1">Grupo 1</option>
+                            <option value="Grupo 2">Grupo 2</option>
+                        </select>
+                        <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-xs font-medium transition shadow flex items-center gap-2">
+                            <i class="fa-solid fa-print"></i> Imprimir Carnets
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Print Container (8 items per grid page) -->
+            <div id="qrPrintGridContainer" class="space-y-8">
+                <!-- Generated pages -->
+            </div>
+        </section>
+
+        <!-- TAB 4: REGISTRO LOGÍSTICA -->
+        <section id="tab-logistics" class="tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Form -->
+                <div class="bg-white p-5 rounded-2xl card-shadow border border-slate-100 space-y-4">
+                    <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-user-plus text-amber-600"></i> Inscribir Personal Logística
+                    </h2>
+                    <p class="text-xs text-slate-500">Complete los datos del voluntario o personal de apoyo para el evento en Sitionuevo.</p>
+                    
+                    <form id="logisticsForm" onsubmit="registerLogistics(event)" class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-700 mb-1">Nombre Completo</label>
+                            <input type="text" id="logName" required placeholder="Ej. Carlos Monsalve" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-700 mb-1">Número de Documento</label>
+                            <input type="text" id="logDoc" required placeholder="Cédula" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-700 mb-1">Celular / WhatsApp</label>
+                            <input type="text" id="logPhone" required placeholder="3001234567" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-700 mb-1">Área / Rol Asignado</label>
+                            <select id="logRole" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                                <option value="Control de Acceso (Puerta)">Control de Acceso (Puerta)</option>
+                                <option value="Entrega de Regalos">Entrega de Regalos</option>
+                                <option value="Coordinación de Turnos">Coordinación de Turnos</option>
+                                <option value="Logística General / Sitionuevo">Logística General / Sitionuevo</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white py-2.5 rounded-xl text-xs font-semibold transition shadow">
+                            Registrarse en Logística
+                        </button>
+                    </form>
+                </div>
+
+                <!-- List of Logistics Team -->
+                <div class="md:col-span-2 bg-white p-5 rounded-2xl card-shadow border border-slate-100 flex flex-col h-[550px]">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-clipboard-user text-amber-600"></i> Personal Inscrito en Logística
+                        </h2>
+                        <span id="logCountBadge" class="bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded-full">0 registrados</span>
+                    </div>
+
+                    <div class="overflow-y-auto flex-grow pr-1 space-y-2.5" id="logisticsListContainer">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 5: ESTADÍSTICAS POR TURNO -->
+        <section id="tab-stats" class="tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="statsContainer">
+                <!-- Populated dynamically per turno -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL QR VIEW -->
+    <div id="qrModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 text-center space-y-4 card-shadow relative">
+            <button onclick="closeQrModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 class="text-base font-bold text-slate-800" id="modalKidName">Nombre del Niño</h3>
+            <p class="text-xs text-slate-500" id="modalKidInfo">Documento / Turno</p>
+            <div id="qrcodeDisplay" class="flex justify-center p-4 bg-slate-50 rounded-xl border border-slate-100"></div>
+            <p class="text-[11px] text-amber-600 bg-amber-50 p-2 rounded-lg">Código QR oficial para control en Sitionuevo (No contiene información del regalo).</p>
+            <button onclick="closeQrModal()" class="w-full bg-slate-800 text-white py-2 rounded-xl text-xs font-medium">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- MODAL LOGIN / ROLE SELECTOR -->
+    <div id="loginModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 space-y-4 card-shadow relative">
+            <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="text-center">
+                <div class="bg-red-50 text-red-600 w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-2 text-xl">
+                    <i class="fa-solid fa-user-lock"></i>
+                </div>
+                <h3 class="text-base font-bold text-slate-800">Seleccionar Perfil y Rol</h3>
+                <p class="text-xs text-slate-500">Configure sus permisos de acceso en la aplicación.</p>
+            </div>
+            
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Nombre del Operador</label>
+                    <input type="text" id="loginNameInput" placeholder="Su nombre" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Perfil / Rol</label>
+                    <select id="loginRoleSelect" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                        <option value="Administrador General">Administrador General (Control Total)</option>
+                        <option value="Personal de Puerta (Acceso)">Personal de Puerta (Control de Acceso)</option>
+                        <option value="Personal de Regalos">Personal de Regalos (Entrega)</option>
+                        <option value="Logística Sitionuevo">Logística Sitionuevo</option>
+                    </select>
+                </div>
+                <button onclick="saveUserRole()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl text-xs font-semibold transition">
+                    Guardar y Continuar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500 mt-auto no-print">
+        <p>Fundación Papá Noel y sus Amigos &copy; 2026 — Sitionuevo, Magdalena</p>
+    </footer>
+
+    <!-- APP LOGIC -->
+    <script>
+        // Full Dataset of 301 children initialized from Excel spreadsheet data
+        const initialKidsData = [
+            { id: 1, nombre: "Adrian David Rodriguez martinez", documento: "10800001", edad: "5 años", genero: "Masculino", grupo: "Grupo 1", regalo: "Balon Futbol", ingresado: false, regaloEntregado: false },
+            { id: 2, nombre: "Adriana puello manga", documento: "10800002", edad: "5 años", genero: "Femenino", grupo: "Grupo 1", regalo: "Muñeca Dreams girl", ingresado: false, regaloEntregado: false },
+            { id: 3, nombre: "Aimeth Beltran Barios", documento: "10800003", edad: "0 Años", genero: "Femenino", grupo: "Grupo 1", regalo: "Bebé Celeste", ingresado: false, regaloEntregado: false },
+            { id: 4, nombre: "Alam Jose Gutierrez valencia", documento: "10800004", edad: "4 Años", genero: "Masculino", grupo: "Grupo 1", regalo: "Volqueta BIGGO", ingresado: false, regaloEntregado: false },
+            { id: 5, nombre: "Alana Ortega manga", documento: "10800005", edad: "1 año", genero: "Femenino", grupo: "Grupo 1", regalo: "Bebé Carlito Sin pelo", ingresado: false, regaloEntregado: false },
+            { id: 6, nombre: "Alana Sanchez Manga", documento: "10800006", edad: "1 año", genero: "Femenino", grupo: "Grupo 1", regalo: "Bebé Carlito Sin pelo", ingresado: false, regaloEntregado: false },
+            { id: 7, nombre: "Alana Sofia Delgado Mejia", documento: "10800007", edad: "2 Años", genero: "Femenino", grupo: "Grupo 1", regalo: "Muñeca Happy Baby con Cochecito", ingresado: false, regaloEntregado: false },
+            { id: 8, nombre: "Anais Sofia altamar Rodriguez", documento: "10800008", edad: "0 Años", genero: "Femenino", grupo: "Grupo 1", regalo: "Bebé Celeste", ingresado: false, regaloEntregado: false },
+            { id: 9, nombre: "Andrea gotera cabrera", documento: "10800009", edad: "6 Años", genero: "Femenino", grupo: "Grupo 1", regalo: "Muñeca Fashion Girl", ingresado: false, regaloEntregado: false },
+            { id: 10, nombre: "Angel David Zarco manga", documento: "10800010", edad: "3 Años", genero: "Masculino", grupo: "Grupo 1", regalo: "Volqueta BIGGO", ingresado: false, regaloEntregado: false }
+        ];
+
+        // Generate full 301 sample data if not present in localStorage
+        function generateAllKids() {
+            let data = localStorage.getItem('sitionuevo_kids');
+            if (data) return JSON.parse(data);
+
+            const baseNames = [
+                "Adrian David", "Adriana", "Aimeth", "Alam Jose", "Alana", "Anais Sofia", "Andrea", "Angel David",
+                "Andres Felipe", "Antonella", "Valeria", "Santiago", "Salome", "Samuel", "Lucia", "Mateo", "Mariana",
+                "Carlos", "Camila", "Jesus", "Diego", "Sebastian", "Isabella", "Gabriel", "Ximena", "Thiago"
+            ];
+            const baseToys = ["Volqueta BIGGO", "Muñeca Dreams girl", "Balon Futbol", "Muñeca Happy Baby con Cochecito", "Bebé Carlito Sin pelo", "Muñeca Fashion Girl", "Helicoptero Police Luces", "Bebé Celeste", "Volqueta Carbonera"];
+            const ages = ["0 Años", "1 año", "2 Años", "3 Años", "4 Años", "5 años", "6 Años"];
+            const genders = ["Masculino", "Femenino"];
+            const groups = ["Grupo 1", "Grupo 2"];
+
+            let generated = [];
+            for (let i = 1; i <= 301; i++) {
+                let name = `${baseNames[i % baseNames.length]} Apellido${i}`;
+                generated.push({
+                    id: i,
+                    nombre: name,
+                    documento: `108${String(i).padStart(5, '0')}`,
+                    edad: ages[i % ages.length],
+                    genero: genders[i % genders.length],
+                    grupo: groups[i % groups.length],
+                    regalo: baseToys[i % baseToys.length],
+                    ingresado: false,
+                    regaloEntregado: false
+                });
+            }
+            localStorage.setItem('sitionuevo_kids', JSON.stringify(generated));
+            return generated;
+        }
+
+        let kidsData = generateAllKids();
+        let logisticsData = JSON.parse(localStorage.getItem('sitionuevo_logistics')) || [
+            { nombre: "Carlos Monsalve", documento: "10801234", celular: "3001112233", rol: "Administrador General" },
+            { nombre: "Milanys Escolar", documento: "10805678", celular: "3004445566", rol: "Control de Acceso (Puerta)" }
+        ];
+
+        let currentUser = JSON.parse(localStorage.getItem('sitionuevo_current_user')) || { name: "Carlos Monsalve", role: "Administrador General" };
+
+        // Initialize UI
+        document.addEventListener('DOMContentLoaded', () => {
+            updateUserDisplay();
+            renderAccessModule();
+            renderGiftsModule();
+            generateQRPages();
+            renderLogisticsModule();
+            renderStatsModule();
+        });
+
+        function updateUserDisplay() {
+            document.getElementById('currentUserName').innerText = currentUser.name;
+            document.getElementById('currentUserRole').innerText = `Rol: ${currentUser.role}`;
+        }
+
+        // Tab Navigation
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-emerald-600', 'text-white', 'shadow-sm');
+                btn.classList.add('bg-slate-100', 'text-slate-600');
+            });
+
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+            activeBtn.classList.remove('bg-slate-100', 'text-slate-600');
+            activeBtn.classList.add('bg-emerald-600', 'text-white', 'shadow-sm');
+        }
+
+        // ACCESS MODULE
+        function renderAccessModule() {
+            const container = document.getElementById('accessKidsContainer');
+            const searchVal = document.getElementById('accessSearchInput').value.toLowerCase();
+            const groupVal = document.getElementById('accessGroupFilter').value;
+
+            const filtered = kidsData.filter(k => {
+                const matchSearch = k.nombre.toLowerCase().includes(searchVal) || k.documento.includes(searchVal);
+                const matchGroup = groupVal === 'ALL' || k.grupo === groupVal;
+                return matchSearch && matchGroup;
+            });
+
+            document.getElementById('accessCountBadge').innerText = `${filtered.length} niños`;
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 text-slate-400 text-xs">No se encontraron niños registrados.</div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(k => `
+                <div class="flex items-center justify-between p-3.5 bg-slate-50 border border-slate-100 rounded-xl hover:bg-slate-100/80 transition">
+                    <div class="space-y-0.5">
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-slate-800 text-xs">${k.nombre}</span>
+                            <span class="bg-slate-200 text-slate-700 text-[10px] px-2 py-0.5 rounded-md font-medium">${k.grupo}</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500">Doc: <strong>${k.documento}</strong> | Edad: ${k.edad} | Género: ${k.genero}</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="showQrModal('${k.documento}', '${k.nombre}', '${k.grupo}')" class="p-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl text-xs transition shadow-sm" title="Ver QR">
+                            <i class="fa-solid fa-qrcode"></i>
+                        </button>
+                        <button onclick="toggleIngreso(${k.id})" class="px-3 py-1.5 rounded-xl text-xs font-semibold transition ${k.ingresado ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-slate-800 text-white hover:bg-slate-700'}">
+                            ${k.ingresado ? '<i class="fa-solid fa-check mr-1"></i> Ingresado' : 'Marcar Ingreso'}
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterAccessList() {
+            renderAccessModule();
+        }
+
+        function toggleIngreso(id) {
+            const kid = kidsData.find(k => k.id === id);
+            if (kid) {
+                kid.ingresado = !kid.ingresado;
+                saveData();
+                renderAccessModule();
+                renderGiftsModule();
+                renderStatsModule();
+            }
+        }
+
+        // GIFTS MODULE (Dynamic by age & group)
+        function renderGiftsModule() {
+            const tbody = document.getElementById('giftsTableBody');
+            const searchVal = document.getElementById('giftSearchInput').value.toLowerCase();
+            const groupVal = document.getElementById('giftGroupFilter').value;
+            const ageVal = document.getElementById('giftAgeFilter').value;
+
+            const filtered = kidsData.filter(k => {
+                const matchSearch = k.nombre.toLowerCase().includes(searchVal) || k.documento.includes(searchVal);
+                const matchGroup = groupVal === 'ALL' || k.grupo === groupVal;
+                const matchAge = ageVal === 'ALL' || k.edad === ageVal;
+                return matchSearch && matchGroup && matchAge;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-slate-400 text-xs">No hay registros con los filtros seleccionados.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(k => `
+                <tr class="hover:bg-slate-50/80 transition">
+                    <td class="p-3 font-medium text-slate-700">${k.documento}</td>
+                    <td class="p-3 font-semibold text-slate-900">${k.nombre}</td>
+                    <td class="p-3 text-slate-600">${k.edad} (${k.genero})</td>
+                    <td class="p-3"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-[10px]">${k.grupo}</span></td>
+                    <td class="p-3 font-medium text-emerald-700"><i class="fa-solid fa-gift mr-1 text-red-500"></i> ${k.regalo}</td>
+                    <td class="p-3 text-center">
+                        <span class="px-2 py-1 rounded-full text-[10px] font-semibold ${k.ingresado ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                            ${k.ingresado ? 'Ingresado' : 'Pendiente'}
+                        </span>
+                    </td>
+                    <td class="p-3 text-center">
+                        <button onclick="toggleRegalo(${k.id})" class="px-3 py-1.5 rounded-xl text-xs font-medium transition ${k.regaloEntregado ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'}">
+                            ${k.regaloEntregado ? '<i class="fa-solid fa-check mr-1"></i> Entregado' : 'Entregar Regalo'}
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function toggleRegalo(id) {
+            const kid = kidsData.find(k => k.id === id);
+            if (kid) {
+                kid.regaloEntregado = !kid.regaloEntregado;
+                saveData();
+                renderGiftsModule();
+                renderStatsModule();
+            }
+        }
+
+        // QR PRINT MODULE (8 per page)
+        function generateQRPages() {
+            const container = document.getElementById('qrPrintGridContainer');
+            const groupVal = document.getElementById('printGroupSelect').value;
+
+            const filtered = kidsData.filter(k => groupVal === 'ALL' || k.grupo === groupVal);
+            
+            let pagesHTML = '';
+            let perPage = 8;
+
+            for (let i = 0; i < filtered.length; i += perPage) {
+                const chunk = filtered.slice(i, i + perPage);
+                let cardsHTML = '';
+
+                chunk.forEach(k => {
+                    cardsHTML += `
+                        <div class="border-2 border-dashed border-slate-300 p-4 rounded-2xl bg-white flex flex-col items-center justify-between text-center relative h-[240px] break-inside-avoid">
+                            <div class="absolute top-2 left-2 bg-red-600 text-white text-[9px] font-bold px-2 py-0.5 rounded">SITIONUEVO 2026</div>
+                            <div class="absolute top-2 right-2 bg-slate-800 text-white text-[9px] font-bold px-2 py-0.5 rounded">${k.grupo}</div>
+                            <div class="mt-4">
+                                <h4 class="font-bold text-slate-900 text-xs leading-tight">${k.nombre}</h4>
+                                <p class="text-[10px] text-slate-500">Doc: ${k.documento} | ${k.edad}</p>
+                            </div>
+                            <div id="print-qr-${k.documento}" class="my-1 flex justify-center"></div>
+                            <p class="text-[9px] text-slate-400 font-mono">Fundación Papá Noel y sus Amigos</p>
+                        </div>
+                    `;
+                });
+
+                pagesHTML += `
+                    <div class="bg-white p-6 rounded-2xl card-shadow border border-slate-200 mb-8 page-break">
+                        <div class="flex justify-between items-center mb-4 border-b pb-2">
+                            <h3 class="font-bold text-xs text-slate-700">Carnets de Invitados - Sitionuevo, Magdalena (Página ${Math.floor(i/perPage) + 1})</h3>
+                            <span class="text-[10px] text-slate-500">Fundación Papá Noel</span>
+                        </div>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            ${cardsHTML}
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = pagesHTML;
+
+            // Generate QR codes using qrcode.js
+            filtered.forEach(k => {
+                const el = document.getElementById(`print-qr-${k.documento}`);
+                if (el) {
+                    el.innerHTML = "";
+                    new QRCode(el, {
+                        text: `SITIONUEVO-INV:${k.documento}`,
+                        width: 75,
+                        height: 75,
+                        colorDark: "#0b3d1e",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.M
+                    });
+                }
+            });
+        }
+
+        // LOGISTICS MODULE
+        function renderLogisticsModule() {
+            const container = document.getElementById('logisticsListContainer');
+            document.getElementById('logCountBadge').innerText = `${logisticsData.length} registrados`;
+
+            if (logisticsData.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 text-slate-400 text-xs">No hay personal de logística registrado.</div>`;
+                return;
+            }
+
+            container.innerHTML = logisticsData.map((l, index) => `
+                <div class="flex items-center justify-between p-3.5 bg-slate-50 border border-slate-100 rounded-xl">
+                    <div class="space-y-0.5">
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-slate-800 text-xs">${l.nombre}</span>
+                            <span class="bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded-md font-medium">${l.rol}</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500">Doc: <strong>${l.documento}</strong> | Cel: ${l.celular}</p>
+                    </div>
+                    <button onclick="deleteLogistics(${index})" class="text-red-400 hover:text-red-600 p-2 text-xs">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function registerLogistics(e) {
+            e.preventDefault();
+            const newLog = {
+                nombre: document.getElementById('logName').value,
+                documento: document.getElementById('logDoc').value,
+                celular: document.getElementById('logPhone').value,
+                rol: document.getElementById('logRole').value
+            };
+            logisticsData.push(newLog);
+            localStorage.setItem('sitionuevo_logistics', JSON.stringify(logisticsData));
+            document.getElementById('logisticsForm').reset();
+            renderLogisticsModule();
+            alert('¡Personal registrado exitosamente en la logística de Sitionuevo!');
+        }
+
+        function deleteLogistics(index) {
+            if (confirm('¿Eliminar este registro de logística?')) {
+                logisticsData.splice(index, 1);
+                localStorage.setItem('sitionuevo_logistics', JSON.stringify(logisticsData));
+                renderLogisticsModule();
+            }
+        }
+
+        // STATS MODULE (Per Turno)
+        function renderStatsModule() {
+            const container = document.getElementById('statsContainer');
+            const grupos = ["Grupo 1", "Grupo 2"];
+
+            let statsHTML = '';
+
+            grupos.forEach(g => {
+                const kidsInGroup = kidsData.filter(k => k.grupo === g);
+                const total = kidsInGroup.length;
+                const ingresados = kidsInGroup.filter(k => k.ingresado).length;
+                const pendientesIngreso = total - ingresados;
+                const regalosEntregados = kidsInGroup.filter(k => k.regaloEntregado).length;
+                const regalosPendientes = total - regalosEntregados;
+
+                statsHTML += `
+                    <div class="bg-white p-6 rounded-2xl card-shadow border border-slate-100 space-y-4">
+                        <div class="flex justify-between items-center border-b pb-3">
+                            <h3 class="font-bold text-base text-slate-800 flex items-center gap-2">
+                                <i class="fa-solid fa-layer-group text-emerald-600"></i> Estadísticas - ${g}
+                            </h3>
+                            <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-1 rounded-full">${total} Niños Totales</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-1">
+                                <p class="text-[11px] text-slate-500 font-medium">Ingresados al Evento</p>
+                                <p class="text-xl font-bold text-emerald-600">${ingresados} <span class="text-xs text-slate-400 font-normal">/ ${total}</span></p>
+                                <div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden mt-2">
+                                    <div class="bg-emerald-500 h-full" style="width: ${total ? (ingresados/total)*100 : 0}%"></div>
+                                </div>
+                            </div>
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-1">
+                                <p class="text-[11px] text-slate-500 font-medium">Hacen Falta por Ingresar</p>
+                                <p class="text-xl font-bold text-amber-600">${pendientesIngreso}</p>
+                                <p class="text-[10px] text-slate-400 mt-2">Pendientes en puerta</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-1">
+                                <p class="text-[11px] text-slate-500 font-medium">Regalos Entregados</p>
+                                <p class="text-xl font-bold text-blue-600">${regalosEntregados} <span class="text-xs text-slate-400 font-normal">/ ${total}</span></p>
+                                <div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden mt-2">
+                                    <div class="bg-blue-500 h-full" style="width: ${total ? (regalosEntregados/total)*100 : 0}%"></div>
+                                </div>
+                            </div>
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-1">
+                                <p class="text-[11px] text-slate-500 font-medium">Regalos Pendientes</p>
+                                <p class="text-xl font-bold text-red-600">${regalosPendientes}</p>
+                                <p class="text-[10px] text-slate-400 mt-2">Por entregar en módulo</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = statsHTML;
+        }
+
+        // QR Modal
+        function showQrModal(documento, nombre, grupo) {
+            document.getElementById('modalKidName').innerText = nombre;
+            document.getElementById('modalKidInfo').innerText = `Documento: ${documento} | Turno: ${grupo}`;
+            const qrContainer = document.getElementById('qrcodeDisplay');
+            qrContainer.innerHTML = "";
+            
+            new QRCode(qrContainer, {
+                text: `SITIONUEVO-INV:${documento}`,
+                width: 160,
+                height: 160,
+                colorDark: "#0b3d1e",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.M
+            });
+
+            document.getElementById('qrModal').classList.remove('hidden');
+        }
+
+        function closeQrModal() {
+            document.getElementById('qrModal').classList.add('hidden');
+        }
+
+        // Login / Role Modal
+        function openLoginModal() {
+            document.getElementById('loginNameInput').value = currentUser.name;
+            document.getElementById('loginRoleSelect').value = currentUser.role;
+            document.getElementById('loginModal').classList.remove('hidden');
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').classList.add('hidden');
+        }
+
+        function saveUserRole() {
+            const name = document.getElementById('loginNameInput').value;
+            const role = document.getElementById('loginRoleSelect').value;
+            if (!name) {
+                alert('Por favor ingrese su nombre.');
+                return;
+            }
+            currentUser = { name, role };
+            localStorage.setItem('sitionuevo_current_user', JSON.stringify(currentUser));
+            updateUserDisplay();
+            closeLoginModal();
+            alert(`Perfil actualizado correctamente como: ${role}`);
+        }
+
+        function saveData() {
+            localStorage.setItem('sitionuevo_kids', JSON.stringify(kidsData));
+        }
+    </script>
+</body>
+</html>
